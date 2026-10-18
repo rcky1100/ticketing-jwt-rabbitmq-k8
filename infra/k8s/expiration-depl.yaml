@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expiration-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expiration
+  template:
+    metadata:
+      labels:
+        app: expiration
+    spec:
+      containers:
+        - name: expiration
+          image: expiration-app-rmq:1.0
+          env:
+            - name: RABBIT_MQ_URL
+              value: "amqp://admin:admin@rabbit-mq-srv:5672"
+            - name: REDIS_HOST
+              value: expiration-redis-srv
