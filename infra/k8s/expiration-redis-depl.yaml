@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: expiration-redis
-          image: redis
+          image: redis:7
 ---
 apiVersion: v1
 kind: Service

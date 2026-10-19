@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: auth-app-rmq:1.0
+          image: rmq-auth-app:1.0
           env:
             - name: MONGO_URI
               value: "mongodb://auth-mongo-srv:27017/auth"

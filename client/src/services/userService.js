@@ -1,6 +1,6 @@
 import http from "./httpService";
 
-const apiEndpoint = "/api";
+const apiEndpoint = (import.meta.env.VITE_AUTH_API_URL || "") + "/api";
 export const register = async (user) => {
   return http.post(apiEndpoint + "/users/signup", {
     email: user.username,

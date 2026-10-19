@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: client
-          image: client-app-rmq:1.0
+          image: rmq-client-app:1.0
           imagePullPolicy: IfNotPresent
 ---
 apiVersion: v1

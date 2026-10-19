@@ -1,6 +1,6 @@
 import http from "./httpService";
 
-const apiEndpoint = "/api/orders";
+const apiEndpoint = (import.meta.env.VITE_ORDER_API_URL || "") + "/api/orders";
 export const getOrders = async () => {
   return http.get(apiEndpoint);
 };

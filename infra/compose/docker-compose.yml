@@ -1,0 +1,129 @@
+x-common-env: &common-env
+  JWT_KEY: sknew
+  RABBIT_MQ_URL: amqp://admin:admin@rabbit-mq:5672
+
+services:
+  auth_api:
+    build:
+      context: ../../auth
+    ports:
+      - 3000:3000
+    environment:
+      <<: *common-env
+      MONGO_URI: mongodb://mongo:27017/ticketing
+    depends_on:
+      - mongo
+    volumes:
+      - ../../auth:/var/www
+      - auth_node_modules:/var/www/node_modules
+  ticket_api:
+    build:
+      context: ../../tickets
+    ports:
+      - 3001:3001
+    environment:
+      <<: *common-env
+      MONGO_URI: mongodb://mongo:27017/mic_ticket
+      
+    depends_on:
+      - mongo
+      - rabbit-mq
+    volumes:
+      - ../../tickets:/var/www
+      - ticket_node_modules:/var/www/node_modules
+
+  payment_api:
+    build:
+      context: ../../payments
+    ports:
+      - 3002:3002
+    environment:
+      <<: *common-env
+      MONGO_URI: mongodb://mongo:27017/mic_payments
+    env_file:
+      - .env      
+      
+    depends_on:
+      - mongo
+      - rabbit-mq
+    volumes:
+      - ../../payments:/var/www
+      - payment_node_modules:/var/www/node_modules
+  order_api:
+    build:
+      context: ../../orders
+    ports:
+      - 3003:3003
+    environment:
+      <<: *common-env
+      MONGO_URI: mongodb://mongo:27017/mic_order
+      
+    depends_on:
+      - mongo
+      - rabbit-mq
+    volumes:
+      - ../../orders:/var/www
+      - order_node_modules:/var/www/node_modules
+
+  expiration_api:
+    build:
+      context: ../../expiration
+    environment:
+      <<: *common-env
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - rabbit-mq
+      - redis
+    volumes:
+      - ../../expiration:/var/www
+      - expiration_node_modules:/var/www/node_modules
+  frontend:
+    build:
+      context: ../../client
+    ports:
+      - 5178:5173
+    environment:
+      VITE_AUTH_API_URL: http://localhost:3000
+      VITE_TICKET_API_URL: http://localhost:3001
+      VITE_PAYMENT_API_URL: http://localhost:3002
+      VITE_ORDER_API_URL: http://localhost:3003
+    volumes:
+      - ../../client:/app
+      - node_modules:/app/node_modules
+  mongo:
+    image: mongo:8
+    volumes:
+      - ticketing-mongo-data:/data/db
+  rabbit-mq:
+    image: rabbitmq:4-management
+    container_name: rabbit-mq
+    restart: unless-stopped
+
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+  redis:
+    image: redis:7
+    environment:
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: 6379
+    volumes:
+      - redis-data:/data
+volumes:
+  auth_node_modules:
+  ticket_node_modules:
+  payment_node_modules:
+  order_node_modules:
+  expiration_node_modules:
+  ticketing-mongo-data:
+  redis-data:
+  node_modules:
+  rabbitmq-data:

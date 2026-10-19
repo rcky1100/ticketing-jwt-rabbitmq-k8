@@ -1,6 +1,7 @@
 import http from "./httpService";
 
-const apiEndpoint = "/api/tickets";
+const apiEndpoint =
+  (import.meta.env.VITE_TICKET_API_URL || "") + "/api/tickets";
 export const getTickets = async () => {
   return http.get(apiEndpoint);
 };

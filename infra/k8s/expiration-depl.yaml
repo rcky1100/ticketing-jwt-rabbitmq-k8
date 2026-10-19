@@ -12,9 +12,21 @@ spec:
       labels:
         app: expiration
     spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z rabbit-mq-srv 5672; do
+                echo "Waiting for RabbitMQ..."
+                sleep 2
+              done
+              echo "RabbitMQ is accepting connections!"
       containers:
         - name: expiration
-          image: expiration-app-rmq:1.0
+          image: rmq-expiration-app:1.0
           env:
             - name: RABBIT_MQ_URL
               value: "amqp://admin:admin@rabbit-mq-srv:5672"
